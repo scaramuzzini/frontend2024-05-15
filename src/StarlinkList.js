@@ -15,19 +15,25 @@ const satIcon = new L.icon({
 
 function StarlinkList() {
     const [starlinks, setStarlinks] = useState([]);
+    const [page,setPage] = useState(1);
 
-    useEffect(() => { 
-        const fetchStarlinks = async (page) => {
-            const response = await axios.post('https://api.spacexdata.com/v4/starlink/query', {
-                "query": {},
-                "options": { page: page, limit: 100 }
-            });
-            console.log(response.data);
-            setStarlinks(response.data.docs);
-        }
-        fetchStarlinks(4);
-    },[]);
-    
+    const carregarProxima = () => {
+        const proximaPagina = page + 1;
+        setPage(proximaPagina);
+        fetchStarlinks(proximaPagina);
+    };
+
+    const fetchStarlinks = async (page) => {
+        const response = await axios.post('https://api.spacexdata.com/v4/starlink/query', {
+            "query": {},
+            "options": { page: page, limit: 100 }
+        });
+        console.log(response.data);
+        //setStarlinks(response.data.docs);
+        setStarlinks((docsAtuais) => [...docsAtuais, ...response.data.docs]);
+    };
+
+
 
 
     //Meu componente starlink
@@ -49,6 +55,8 @@ function StarlinkList() {
                 }
                 
             </MapContainer>
+            <h4>{page}</h4>
+            <button onClick={carregarProxima}>Carregar mais</button>
         </>
     )
 }
