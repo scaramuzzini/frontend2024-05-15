@@ -3,25 +3,29 @@ import './StarlinkList.css';
 import axios from 'axios';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
+const satIcon = new L.icon({
+    iconUrl: 'satellite.png',
+    iconSize:[25,25],
+});
 
 // npm install leaflet
 // npm install react-leaflet
 
 function StarlinkList() {
-
     const [starlinks, setStarlinks] = useState([]);
 
     useEffect(() => { 
-        const fetchStarlinks = async () => {
+        const fetchStarlinks = async (page) => {
             const response = await axios.post('https://api.spacexdata.com/v4/starlink/query', {
                 "query": {},
-                "options": { limit: 100 }
+                "options": { page: page, limit: 100 }
             });
             console.log(response.data);
             setStarlinks(response.data.docs);
         }
-        fetchStarlinks();
+        fetchStarlinks(4);
     },[]);
     
 
@@ -36,7 +40,7 @@ function StarlinkList() {
                     starlinks
                         .filter((sat)=> sat.latitude !== null && sat.longitude !== null)
                         .map((sat) => (
-                        <Marker position={[sat.latitude, sat.longitude]}>
+                        <Marker position={[sat.latitude, sat.longitude]} icon={satIcon}>
                             <Popup>
                                 {sat.spaceTrack.OBJECT_NAME}
                             </Popup>
